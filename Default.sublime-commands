@@ -1,0 +1,16 @@
+[
+	{ "caption": "p3n: Check for AI", "command": "p3n_check" },
+	{ "caption": "p3n: Rewrite", "command": "p3n_rewrite" },
+	{ "caption": "p3n: Cancel", "command": "p3n_cancel" },
+	{ "caption": "p3n: Clear Results", "command": "p3n_clear" },
+	{ "caption": "p3n: Set API Key", "command": "p3n_set_api_key" },
+	{ "caption": "p3n: Remove API Key", "command": "p3n_remove_api_key" },
+	{
+		"caption": "Preferences: p3n Settings",
+		"command": "edit_settings",
+		"args": {
+			"base_file": "${packages}/p3n/p3n.sublime-settings",
+			"default": "// Your p3n settings. The defaults are on the left.\n{\n\t$0\n}\n"
+		}
+	}
+]

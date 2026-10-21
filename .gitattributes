@@ -1,0 +1,11 @@
+* text=auto eol=lf
+*.png binary
+
+# Left out of the package Package Control installs.
+/.github export-ignore
+/dev export-ignore
+/tests export-ignore
+/screenshots export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/CONTRIBUTING.md export-ignore

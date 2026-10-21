@@ -1,0 +1,28 @@
+[
+	{
+		"id": "preferences",
+		"children": [
+			{
+				"caption": "Package Settings",
+				"mnemonic": "P",
+				"id": "package-settings",
+				"children": [
+					{
+						"caption": "p3n",
+						"children": [
+							{
+								"caption": "Settings",
+								"command": "edit_settings",
+								"args": {
+									"base_file": "${packages}/p3n/p3n.sublime-settings",
+									"default": "// Your p3n settings. The defaults are on the left.\n{\n\t$0\n}\n"
+								}
+							},
+							{ "caption": "Set API Key…", "command": "p3n_set_api_key" }
+						]
+					}
+				]
+			}
+		]
+	}
+]

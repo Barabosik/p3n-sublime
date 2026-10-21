@@ -1,0 +1,6 @@
+[
+	// Shown only when text is selected (menu: true makes the commands check).
+	{ "caption": "-", "id": "p3n" },
+	{ "caption": "p3n: Check for AI", "command": "p3n_check", "args": { "menu": true } },
+	{ "caption": "p3n: Rewrite", "command": "p3n_rewrite", "args": { "menu": true } }
+]

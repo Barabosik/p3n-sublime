@@ -1,0 +1,55 @@
+# Unit tests on the plugin hosts' Python versions, and Package Control's own review of the files it installs.
+# Never calls api.p3n.si.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # Sublime Text 4 runs plugins on Python 3.8 (builds 4107-4204) or 3.14 (4205 and later).
+        python: ['3.8', '3.14']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      - name: Unit tests
+        run: uv run --no-project --python ${{ matrix.python }} python -m unittest discover -s tests -v
+
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The reviewer's repository checks read the tags.
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      # What Package Control installs: the repository without the export-ignore paths.
+      - name: Package as Package Control gets it
+        run: |
+          mkdir -p "$RUNNER_TEMP/p3n"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/p3n"
+          ls -A "$RUNNER_TEMP/p3n"
+      - name: st_package_reviewer
+        run: uvx --python 3.13 --from git+https://github.com/kaste/st_package_reviewer.git st_package_reviewer --fail-on-warnings "$RUNNER_TEMP/p3n"
+      - name: Tags
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version=$(sed -n "s/^VERSION = '\(.*\)'$/\1/p" lib/api.py)
+          test "$GITHUB_REF_NAME" = "$version" || { echo "tag $GITHUB_REF_NAME doesn't match VERSION $version"; exit 1; }
+          uvx --python 3.13 --from git+https://github.com/kaste/st_package_reviewer.git st_package_reviewer --repo=. --fail-on-warnings "$RUNNER_TEMP/p3n"
