@@ -27,8 +27,8 @@ def log(msg):
 
 
 def check(name, ok, detail=''):
-    results.append({'name': name, 'ok': bool(ok), 'detail': str(detail)[:400]})
-    log(('PASS ' if ok else 'FAIL ') + name + ('' if ok else ': ' + str(detail)[:400]))
+    results.append({'name': name, 'ok': bool(ok), 'detail': str(detail)[:1200]})
+    log(('PASS ' if ok else 'FAIL ') + name + ('' if ok else ': ' + str(detail)[:1200]))
 
 
 def save():
@@ -95,7 +95,7 @@ def run(gen):
         except StopIteration:
             return finish()
         except Exception:
-            check('driver', False, traceback.format_exc())
+            check('driver', False, traceback.format_exc()[-1200:])
             return finish()
         if isinstance(what, (int, float)):
             return sublime.set_timeout(step, int(what * 1000))
@@ -149,6 +149,10 @@ def buffer(view):
 
 
 def main():
+    if CONFIG.get('package_control'):
+        for g in package_control_steps():
+            yield g
+        return
     while 'p3n.plugin' not in sys.modules:
         yield 0.2
     m = sys.modules['p3n.plugin']
@@ -398,6 +402,100 @@ def rest(view):
 def keep(name, r):
     with open(os.path.join(OUT, name + '.json'), 'w', encoding='utf-8') as f:
         json.dump(r.result, f, indent=1, ensure_ascii=False)
+
+
+def package_control_steps():
+    # Package Control: Add Repository with the raw repository.json URL, then Install Package > p3n, through the same
+    # calls the input box and the quick panel make. Talks to GitHub; makes no p3n API calls (the checks use the mock).
+    url = CONFIG['repository']
+    tasks_module = 'Package Control.package_control.package_tasks'
+    yield (lambda: tasks_module in sys.modules, 60)
+    check('Package Control loaded', tasks_module in sys.modules)
+    check('p3n not installed before', 'p3n.plugin' not in sys.modules)
+    sublime.run_command('add_repository', {'url': url})
+    repos = sublime.load_settings('Package Control.sublime-settings').get('repositories') or []
+    check('Add Repository: URL saved', url in repos, repos)
+
+    state = {}
+
+    def work():
+        try:
+            runner = sys.modules[tasks_module].PackageTaskRunner()
+            tasks = runner.create_package_tasks(actions=(runner.INSTALL, runner.OVERWRITE))
+            names = [t.package_name for t in tasks]
+            state['count'] = len(names)
+            state['p3n-sublime listed'] = 'p3n-sublime' in names
+            pick = [t for t in tasks if t.package_name == 'p3n']
+            if pick:
+                item = runner.render_quick_panel_items(pick)[0]
+                state['item'] = item if isinstance(item, list) else [item.trigger, item.details, item.annotation]
+                state['version'] = str(pick[0].available_version)  # a PEP440Version
+                # What picking it in the quick panel runs.
+                runner.run_install_tasks(pick)
+        except Exception:
+            state['error'] = traceback.format_exc()
+        state['done'] = True
+    threading.Thread(target=work, daemon=True).start()
+    yield (lambda: state.get('done'), 300)
+    log('listed %s packages; p3n item %r, version %s' % (state.get('count'), state.get('item'), state.get('version')))
+    check('Install Package lists p3n', state.get('item'), state.get('error') or state)
+    check('the version is the latest tag', state.get('version') == '0.1.0', state.get('version'))
+    check('no "p3n-sublime" in the list', not state.get('p3n-sublime listed'))
+    yield (lambda: 'p3n.plugin' in sys.modules, 60)
+    check('the installed package loads', 'p3n.plugin' in sys.modules)
+
+    installed = sublime.installed_packages_path()
+    check('installed as p3n.sublime-package', os.path.isfile(os.path.join(installed, 'p3n.sublime-package')), os.listdir(installed))
+    check('nothing named p3n-sublime', not any('p3n-sublime' in f for f in os.listdir(installed) + os.listdir(sublime.packages_path())))
+    import zipfile
+    with zipfile.ZipFile(os.path.join(installed, 'p3n.sublime-package')) as z:
+        files = z.namelist()
+        meta = json.loads(z.read('package-metadata.json').decode('utf-8')) if 'package-metadata.json' in files else {}
+    log('package files: ' + ', '.join(sorted(files)))
+    check('package-metadata: version 0.1.0', meta.get('version') == '0.1.0', meta)
+    check('has the plugin, lib and .python-version', {'plugin.py', 'lib/api.py', 'lib/core.py', '.python-version'} <= set(files), files)
+    check('export-ignored files left out', not [f for f in files if f.split('/')[0] in ('tests', 'dev', 'screenshots', '.github', 'repository.json')], files)
+    check('settings resolve under Packages/p3n', 'Packages/p3n/p3n.sublime-settings' in sublime.find_resources('p3n.sublime-settings'))
+    check('commands in the palette file', 'Packages/p3n/Default.sublime-commands' in sublime.find_resources('Default.sublime-commands'))
+
+    # The installed (zipped) package works: a check, a rewrite, Replace and one undo, against the mock.
+    m = sys.modules['p3n.plugin']
+    api = sys.modules['p3n.lib.api']
+    mockmod = importlib.import_module('User.p3n_e2e_mock')
+    mock = mockmod.MockApi()
+    api.API = mock.url
+    window = sublime.active_window()
+    place(window)
+    path = os.path.join(OUT, 'team-update.md')
+    with open(path, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(CONFIG['sample'])
+    view = window.open_file(path)
+    yield lambda: not view.is_loading()
+    view.settings().set('word_wrap', True)
+    original = buffer(view)
+    run_ = lambda: m._runs.get(view.id())
+    idle = lambda: run_() is not None and not run_().busy
+    select(view, mockmod.AI_TEXT)
+    view.run_command('p3n_check')
+    yield idle
+    check('installed: Check for AI', run_().result and run_().result['output']['ai'] == 0.96)
+    check('installed: X-P3N-Client', mock.requests[-1][2].get('X-P3N-Client') == 'p3n-sublime/0.1.0')
+    rest(view)
+    yield 0.6
+    yield capture(window, 'installed-check')
+    select(view, mockmod.SHORT)
+    view.run_command('p3n_rewrite')
+    yield idle
+    m.navigate(view, 'p3n:replace')
+    yield 0.3
+    check('installed: Rewrite and Replace', run_().state.get('replaced') and mockmod.SHORT not in buffer(view))
+    view.run_command('undo')
+    check('installed: one undo', buffer(view) == original)
+    messages = [v for w in sublime.windows() for v in w.views() if v.name() == 'Package Control Messages']
+    log('Package Control Messages views: %d' % len(messages))
+    if messages:
+        check('install message shown', 'Thanks for installing p3n' in messages[0].substr(sublime.Region(0, messages[0].size())))
+    mock.stop()
 
 
 def live_steps(m, api, window, view, AI, SHORT, original, run_, idle, tag):

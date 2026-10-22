@@ -39,6 +39,9 @@ It doesn't take focus. Results and screenshots go to `dev/out/mock/`. Needs Pill
 
 - `python dev/e2e.py --live` makes two real keyless calls (one check, one rewrite), which count against your IP's free hour. Output goes to `dev/out/live/`, with the raw answers.
 - `python dev/e2e.py --shots` retakes the README pictures. It answers with `tests/mock.py`'s `LIVE` runs, so it makes no real calls.
+- `python dev/e2e.py --package-control` installs p3n the way the README tells users to. It starts from a Data folder holding only Package Control (copied from your own Sublime Text, or `PC_PACKAGE`). It runs Add Repository with the `repository.json` URL, then installs `p3n` through the same call the Install Package list makes. It checks the package's name, version and files, then runs a check and a rewrite against the stand-in API. It talks to GitHub and packagecontrol.io, and never to the p3n API.
+
+`repository.json` is what Add Repository reads until p3n is in Package Control's default channel. A bare GitHub URL would install the default branch, not the tags, under the name `p3n-sublime`.
 
 ## Package Control review
 

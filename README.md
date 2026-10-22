@@ -18,14 +18,21 @@ Select text in Sublime Text and see if it reads as AI-written, or rewrite it in 
 
 ## Install
 
-**Package Control:** not listed yet. Install it by hand for now.
+It needs Sublime Text 4 (build 4107 or later).
 
-**By hand:**
+**With Package Control.** p3n isn't in Package Control's own list yet, so you add its address once:
+1. Open the command palette (Ctrl+Shift+P, or Cmd+Shift+P on a Mac). Run **Package Control: Add Repository**, paste this address and press Enter:
+   ```
+   https://raw.githubusercontent.com/Barabosik/p3n-sublime/main/repository.json
+   ```
+2. Run **Package Control: Install Package** and choose **p3n**.
+
+Package Control keeps p3n up to date from then on. If the palette has no Package Control commands, run **Install Package Control** first.
+
+**By hand.** This way it doesn't update itself.
 1. In Sublime Text, choose **Preferences › Browse Packages…**.
 2. Put this repository there in a folder named exactly `p3n`. Either clone it with `git clone https://github.com/Barabosik/p3n-sublime.git p3n`, or download the ZIP and rename the folder.
 3. Restart Sublime Text.
-
-It needs Sublime Text 4 (build 4107 or later).
 
 ## Use it
 
