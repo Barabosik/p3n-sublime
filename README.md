@@ -59,6 +59,8 @@ Select some text, then right-click it or open the command palette (Ctrl+Shift+P,
 | p3n: Remove API Key | Removes the saved key. |
 | Preferences: p3n Settings | Opens the settings. |
 
+Check needs at least 40 characters, a sentence or two, and Rewrite at least eight words. p3n says so before sending anything.
+
 The right-click menu shows the first two only when text is selected. p3n adds no key bindings. To add your own, open **Preferences › Key Bindings** and add, for example:
 
 ```json
