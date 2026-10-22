@@ -54,6 +54,6 @@ uvx --python 3.13 --from git+https://github.com/kaste/st_package_reviewer.git st
 
 ## Releasing
 
-1. Bump `VERSION` in `lib/api.py` and the example in `PRIVACY.md` (the tests check they match). Add `messages/<version>.txt` plus its line in `messages.json` if users should hear about the change.
+1. Bump `VERSION` in `lib/api.py` and the example in `PRIVACY.md`, and add the version to `CHANGELOG.md` (the tests check they match). Add `messages/<version>.txt` plus its line in `messages.json` if users should hear about the change.
 2. Commit, then tag the commit with the bare version: `git tag 0.1.1 && git push origin main 0.1.1`. Package Control reads semver tags, and CI fails a tag that doesn't match `VERSION`.
 3. Once the tag is pushed, `python dev/e2e.py --package-control` checks that Package Control installs that version.

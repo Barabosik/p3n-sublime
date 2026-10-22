@@ -10,7 +10,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 # Every call names this client (X-P3N-Client), for the user's usage page.
 CLIENT = 'p3n-sublime/' + VERSION
 

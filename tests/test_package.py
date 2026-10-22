@@ -71,6 +71,10 @@ class PackageTest(unittest.TestCase):
             self.assertRegex(key, r'^(install|\d+\.\d+\.\d+)$')
         self.assertIn('install', load('messages.json'))
 
+    def test_changelog_is_left_out_of_the_package(self):
+        # For the repository's readers; Package Control shows messages/ instead.
+        self.assertIn('/CHANGELOG.md export-ignore', read('.gitattributes'))
+
     def test_python_version(self):
         self.assertEqual(read('.python-version').strip(), '3.8')
         self.assertFalse(os.path.exists(os.path.join(ROOT, '__init__.py')))
@@ -79,6 +83,7 @@ class PackageTest(unittest.TestCase):
         version = re.search(r"^VERSION = '([\d.]+)'$", read('lib/api.py'), re.M).group(1)
         self.assertRegex(version, r'^\d+\.\d+\.\d+$')
         self.assertIn('`p3n-sublime/{}`'.format(version), read('PRIVACY.md'))
+        self.assertIn('\n## {}\n'.format(version), read('CHANGELOG.md'))
         tag = os.environ.get('GITHUB_REF_NAME', '')
         if os.environ.get('GITHUB_REF_TYPE') == 'tag':
             self.assertEqual(tag, version, 'the tag must match lib/api.py VERSION')

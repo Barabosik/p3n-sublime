@@ -1,0 +1,9 @@
+p3n 0.1.2
+=========
+
+- Rewrite needs at least a sentence of eight words. p3n now says so before
+  sending anything, as it already did for Check's 40 characters.
+- When p3n turns down a selection before sending it, the status bar says
+  why too, as it does when a call fails.
+- While a rewrite runs, the status bar also says it takes up to a minute.
+- "p3n: Remove API Key" answers in the status bar when no file is open.
