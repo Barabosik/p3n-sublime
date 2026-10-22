@@ -4,7 +4,7 @@ import html
 import math
 import re
 
-from .api import ApiError, FREE_PER_HOUR, LINKS, MAX_CHARS, MIN_DETECT_CHARS, SITE
+from .api import ApiError, FREE_PER_HOUR, LINKS, MAX_CHARS, MIN_DETECT_CHARS, MIN_REWRITE_WORDS, SITE
 
 LABELS = {'human': 'Likely human-written', 'ai': 'Likely AI-written', 'ai_edited': 'AI-written, then edited',
           'humanized': 'AI-written, then humanized', 'mixed': 'Mixed: part human, part AI'}
@@ -23,6 +23,11 @@ def tone(x):
 
 def words(t):
     return len((t or '').split())
+
+
+def rewrite_words(t):
+    # As the API counts them: runs of the letters A to Z, ' and -, so 2029 isn't a word and č splits one.
+    return len(re.findall(r"[A-Za-z][A-Za-z'-]*", t or ''))
 
 
 def clip(t, n=220):
@@ -52,6 +57,8 @@ def input_error(skill, text, has_key):
         return ApiError(422, 'too_long', msg)
     if skill == 'detect' and len(text) < MIN_DETECT_CHARS:
         return ApiError(422, 'too_short', 'Check needs at least {} characters, a sentence or two. Select more.'.format(MIN_DETECT_CHARS))
+    if skill == 'humanize' and rewrite_words(text) < MIN_REWRITE_WORDS:
+        return ApiError(422, 'too_short', 'Rewrite needs at least a sentence of eight words. Select more.')
     return None
 
 

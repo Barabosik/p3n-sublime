@@ -37,7 +37,21 @@ class CoreTest(unittest.TestCase):
         e = core.input_error('detect', 'x' * 39, False)
         self.assertEqual(e.message, 'Check needs at least 40 characters, a sentence or two. Select more.')
         self.assertIsNone(core.input_error('detect', 'x' * 40, False))
-        self.assertIsNone(core.input_error('humanize', 'Short one.', False))
+        e = core.input_error('humanize', 'Short one.', False)
+        self.assertEqual((e.type, e.message), ('too_short', 'Rewrite needs at least a sentence of eight words. Select more.'))
+        self.assertIsNone(core.input_error('humanize', 'One two three four five six seven eight.', False))
+        self.assertIsNone(core.input_error('humanize', SHORT, False))
+        # Numbers aren't words: seven here.
+        self.assertEqual(core.input_error('humanize', 'In 2029 the team shipped 3 of its 12 apps.', True).type, 'too_short')
+        self.assertEqual(core.input_error('humanize', '   ', False).type, 'too_short')
+
+    def test_rewrite_words(self):
+        # Counted as the API counts them: runs of the letters A to Z, ' and -.
+        self.assertEqual(core.rewrite_words("It's a well-known fact, in 2029."), 5)
+        self.assertEqual(core.rewrite_words('naïve café'), 3)  # na, ve, caf
+        self.assertEqual(core.rewrite_words('Привет, мир'), 0)
+        self.assertEqual(core.rewrite_words(None), 0)
+        self.assertEqual(api.MIN_REWRITE_WORDS, 8)
 
     def test_bad_output(self):
         self.assertIsNone(core.bad_output(FIXTURES['detect']))

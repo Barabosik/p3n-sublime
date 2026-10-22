@@ -294,6 +294,10 @@ def main():
     view.run_command('p3n_check')
     r = run_()
     check('too short: own copy, nothing sent', r.error and 'at least 40 characters' in r.error.message and calls() == n)
+    view.run_command('p3n_rewrite')
+    r = run_()
+    check('rewrite under eight words: own copy, nothing sent',
+          r.error and r.error.message == 'Rewrite needs at least a sentence of eight words. Select more.' and calls() == n, r.error and r.error.message)
     # The hint is a popup that closes when the mouse moves, so record what was shown rather than look for it.
     hints = []
     real_hint = m.hint

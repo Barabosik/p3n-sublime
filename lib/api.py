@@ -28,6 +28,8 @@ MAX_CHARS = {'free': 5000, 'key': 200000}
 FREE_PER_HOUR = 10
 # Detect refuses shorter text (counted after trimming).
 MIN_DETECT_CHARS = 40
+# Humanize refuses fewer words, counted as the API counts them (core.rewrite_words).
+MIN_REWRITE_WORDS = 8
 
 # One request waits this long. The API gives up on a text after 85 s (504 too_long), so this is only a backstop.
 TIMEOUT = 100
