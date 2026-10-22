@@ -427,6 +427,16 @@ def main():
     m.P3nRemoveApiKeyCommand(window).run()
     check('remove key', not m.settings().get('api_key'))
 
+    # With no file open, the key commands answer in the status bar.
+    class NoFile:
+        def active_view(self):
+            return None
+    shown = status_messages(lambda: m.P3nSetApiKeyCommand(NoFile()).check('not-a-key'))
+    check('no file open: a malformed key is explained', shown == ['p3n: Keys start with p3n_. Copy the whole key from the API keys page.'], shown)
+    m.settings().set('api_key', 'p3n_good')
+    shown = status_messages(lambda: m.P3nRemoveApiKeyCommand(NoFile()).run())
+    check('no file open: Remove API Key says so', not m.settings().get('api_key') and shown[:1] and shown[0].startswith('p3n: Key removed'), shown)
+
     # 14. Clear closes the card and the underlines.
     view.run_command('p3n_clear')
     check('clear: card and underlines gone', run_() is None and not view.get_regions('p3n.mark.s0') and not view.get_regions('p3n.source'))

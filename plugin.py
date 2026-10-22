@@ -89,9 +89,9 @@ def show_card(view, content):
 
 
 def hint(view, msg):
-    """A message that needs no card: a popup at the caret, and the status bar."""
+    """A message that needs no card: the status bar, and a popup at the caret when a file is open."""
     sublime.status_message('p3n: ' + msg)
-    if len(view.sel()):
+    if view and len(view.sel()):
         view.show_popup(core.hint_html(msg), sublime.HIDE_ON_MOUSE_MOVE_AWAY, view.sel()[0].b, 640, 320)
 
 
@@ -402,11 +402,7 @@ class P3nSetApiKeyCommand(sublime_plugin.WindowCommand):
         self.say('Saved. Signed in as {}, balance {}.'.format(m.get('email') or 'your account', balance))
 
     def say(self, msg):
-        view = self.window.active_view()
-        if view:
-            hint(view, msg)
-        else:
-            sublime.status_message('p3n: ' + msg)
+        hint(self.window.active_view(), msg)
 
 
 class P3nRemoveApiKeyCommand(sublime_plugin.WindowCommand):
@@ -416,9 +412,7 @@ class P3nRemoveApiKeyCommand(sublime_plugin.WindowCommand):
         msg = 'Key removed. p3n still works without one, with the free hourly limit.'
         if os.environ.get('P3N_API_KEY', '').strip():
             msg = 'Key removed from the settings. P3N_API_KEY is still set, so p3n keeps using that key.'
-        view = self.window.active_view()
-        if view:
-            hint(view, msg)
+        hint(self.window.active_view(), msg)
 
     def is_visible(self):
         return bool((settings().get('api_key') or '').strip())
