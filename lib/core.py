@@ -226,10 +226,15 @@ def footer(run, has_key, free):
     return '<p class="small muted">{}</p>'.format(esc(' · '.join(bits)))
 
 
-def busy_html(skill, seconds):
+def busy_line(skill, seconds):
+    """What the busy card and the status bar say while p3n works."""
     what = 'Checking' if skill == 'detect' else 'Rewriting'
     extra = ' (a rewrite takes up to a minute)' if skill == 'humanize' and seconds > 8 else ''
-    return page(top(ACTIONS[skill]) + '<p>{}… {} s{} &nbsp; {}</p>'.format(what, seconds, esc(extra), button('Cancel', 'p3n:cancel')))
+    return '{}… {} s{}'.format(what, seconds, extra)
+
+
+def busy_html(skill, seconds):
+    return page(top(ACTIONS[skill]) + '<p>{} &nbsp; {}</p>'.format(esc(busy_line(skill, seconds)), button('Cancel', 'p3n:cancel')))
 
 
 def detect_html(run, has_key=False, free=None, found=(), found_hits=()):

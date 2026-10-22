@@ -240,8 +240,7 @@ def find(view, sentence):
 def tick(run):
     if not run.busy or _runs.get(run.view.id()) is not run:
         return
-    what = 'Checking' if run.skill == 'detect' else 'Rewriting'
-    run.view.set_status('p3n', 'p3n: {}… {} s'.format(what, int(time.time() - run.started)))
+    run.view.set_status('p3n', 'p3n: ' + core.busy_line(run.skill, int(time.time() - run.started)))
     render(run)
     sublime.set_timeout(lambda: tick(run), 1000)
 

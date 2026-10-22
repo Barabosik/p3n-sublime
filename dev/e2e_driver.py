@@ -387,6 +387,19 @@ def main():
           run_().error and run_().error.type == 'too_short' and view.get_status('p3n') == '', view.get_status('p3n'))
     mock.delay = 0
 
+    # 11c. A rewrite past 8 s: the status bar says it takes up to a minute, as the card does.
+    mock.delay = 2
+    select(view, SHORT)
+    view.run_command('p3n_rewrite')
+    run_().started -= 9
+    yield 1.2
+    line = view.get_status('p3n')
+    check('long rewrite: the status bar says it takes up to a minute',
+          line.startswith('p3n: Rewriting… ') and line.endswith(' s (a rewrite takes up to a minute)'), line)
+    yield idle
+    check('long rewrite: the busy line goes with the answer', run_().result and view.get_status('p3n') == '', view.get_status('p3n'))
+    mock.delay = 0
+
     # 12. Read-only file: no Replace button.
     select(view, SHORT)
     view.run_command('p3n_rewrite')

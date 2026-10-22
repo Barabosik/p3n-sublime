@@ -160,6 +160,10 @@ class CoreTest(unittest.TestCase):
         self.assertIn('(a rewrite takes up to a minute)', core.busy_html('humanize', 9))
         self.assertNotIn('a rewrite takes', core.busy_html('humanize', 8))
         self.assertIn('href="p3n:cancel"', core.busy_html('detect', 0))
+        # The status bar says the same as the card.
+        self.assertEqual(core.busy_line('detect', 12), 'Checking… 12 s')
+        self.assertEqual(core.busy_line('humanize', 8), 'Rewriting… 8 s')
+        self.assertEqual(core.busy_line('humanize', 9), 'Rewriting… 9 s (a rewrite takes up to a minute)')
 
     def test_status_summary(self):
         self.assertEqual(core.status_summary(FIXTURES['detect']), '96% likely AI. Likely AI-written')
