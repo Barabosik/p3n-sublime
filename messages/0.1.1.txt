@@ -1,0 +1,8 @@
+p3n 0.1.1
+=========
+
+- When a call fails, the status bar shows the same message as the card.
+- The free-limit card says "free calls", not "free checks" (rewrites count
+  too), and says to sign up at p3n.si before creating an API key.
+- "p3n: Set API Key" names sign-up before the API keys page.
+- The rewrite card's note says "the rewrite" instead of "Humanize".

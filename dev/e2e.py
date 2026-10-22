@@ -11,6 +11,7 @@ inside it, and writes results and screenshots to dev/out/<mode>/. Needs Pillow f
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -29,6 +30,9 @@ REPOSITORY = os.environ.get('P3N_REPOSITORY', 'https://raw.githubusercontent.com
 PC_PACKAGE = os.environ.get('PC_PACKAGE', os.path.join(os.environ.get('APPDATA', ''), 'Sublime Text', 'Installed Packages',
                                                        'Package Control.sublime-package'))
 OUT = os.path.join(DEV, 'out', MODE)  # one folder per mode, so a mocked run never wipes a live run's pictures
+# --package-control expects Package Control to install this version: the latest tag, once it's pushed.
+with open(os.path.join(ROOT, 'lib', 'api.py'), encoding='utf-8') as f:
+    VERSION = re.search(r"^VERSION = '(.*)'$", f.read(), re.M).group(1)
 PACKAGE_FILES = ['.python-version', 'plugin.py', 'lib', 'Default.sublime-commands', 'Context.sublime-menu',
                  'Main.sublime-menu', 'p3n.sublime-settings', 'messages.json', 'messages', 'README.md', 'PRIVACY.md', 'LICENSE']
 
@@ -82,7 +86,7 @@ def prepare(live, shots):
     os.makedirs(OUT)
     with open(os.path.join(user, 'p3n_e2e.json'), 'w', encoding='utf-8') as f:
         json.dump({'out': OUT, 'live': live, 'shots': shots, 'sample': SAMPLE,
-                   'package_control': MODE == 'package-control', 'repository': REPOSITORY}, f)
+                   'package_control': MODE == 'package-control', 'repository': REPOSITORY, 'version': VERSION}, f)
 
 
 def main():

@@ -1,7 +1,8 @@
 // p3n settings. Change them in Preferences > Package Settings > p3n > Settings, in the file on the right.
 {
-	// An API key from https://p3n.si/dashboard/keys. Without one, p3n gives you 10 calls an hour, up to
-	// 5,000 characters each. "p3n: Set API Key" in the command palette checks a key with p3n before saving it.
+	// An API key. No key yet? Sign up at https://p3n.si/register, then create one at https://p3n.si/dashboard/keys.
+	// Without a key, p3n gives you 10 calls an hour, up to 5,000 characters each. "p3n: Set API Key" in the command
+	// palette checks a key with p3n before saving it.
 	// The P3N_API_KEY environment variable works too; this setting wins when both are set.
 	// This file is plain text: if you sync or publish your User folder, keep the key out of it.
 	"api_key": "",

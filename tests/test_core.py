@@ -76,7 +76,8 @@ class CoreTest(unittest.TestCase):
     def test_free_limit_copy(self):
         e = api.ApiError(429, 'free_limit', 'x', signup_url='javascript:alert(1)', retry_after=600, free=0)
         html = core.error_html('detect', e)
-        self.assertIn('used up; more in about 10 min.', html)
+        self.assertIn('<p>The free calls for this hour are used up; more in about 10 min.</p>', html)
+        self.assertIn('Sign up at p3n.si for free credit, then create an API key and add it to keep going.', html)
         self.assertIn('href="https://p3n.si/register"', html)
         self.assertNotIn('javascript', html)
         e.signup_url = 'https://p3n.si/register?ref=free'
@@ -85,9 +86,22 @@ class CoreTest(unittest.TestCase):
 
     def test_other_errors(self):
         self.assertIn('href="https://p3n.si/dashboard/billing"', core.error_html('detect', api.ApiError(402, 'insufficient_credit', 'x')))
-        self.assertIn("didn't accept your API key", core.error_html('humanize', api.ApiError(401, 'unauthorized', 'x')))
+        self.assertIn('didn&#x27;t accept your API key', core.error_html('humanize', api.ApiError(401, 'unauthorized', 'x')))
         self.assertIn('Wait a minute', core.error_html('detect', api.ApiError(429, 'rate_limited', 'x')))
         self.assertIn('&lt;b&gt;', core.error_html('detect', api.ApiError(0, 'network', '<b>')))
+
+    def test_error_summary(self):
+        # The status bar's line is the card's first one, not the API's own message.
+        for e, want in ((api.ApiError(429, 'free_limit', 'Free calls are used up.', retry_after=600),
+                         'The free calls for this hour are used up; more in about 10 min.'),
+                        (api.ApiError(429, 'free_limit', 'Free calls are used up.'), 'The free calls for this hour are used up.'),
+                        (api.ApiError(402, 'insufficient_credit', 'x'), 'Your p3n balance is too low for this.'),
+                        (api.ApiError(401, 'unauthorized', 'x'), "p3n didn't accept your API key. It may have been revoked."),
+                        (api.ApiError(429, 'rate_limited', 'x'), 'Too many requests at once. Wait a minute and try again.'),
+                        (api.ApiError(0, 'network', api.NETWORK), api.NETWORK),
+                        (api.ApiError(500, 'error', ''), 'Something went wrong.')):
+            self.assertEqual(core.error_summary(e), want)
+            self.assertIn('<p>{}</p>'.format(core.esc(want)), core.error_html('detect', e))
 
     def test_free_line(self):
         self.assertEqual(core.free_line(None, False), 'Free without a key: 10 calls an hour, up to 5,000 characters each.')
@@ -115,8 +129,10 @@ class CoreTest(unittest.TestCase):
         html = core.humanize_html(run, SHORT, 'This transition helps teams of all sizes.', state={})
         for want in ('No longer reads as AI', '95% → </span>1%', 'AI class', 'Detector model: Likely human-written',
                      'This transition helps teams of all sizes.', 'Replace selection', 'Copy', 'Try another rewrite',
-                     'Kept 7 of 23 words.', 'Check that every claim you need is still there.'):
+                     'Kept 7 of 23 words.', 'The rewrite drops filler and general statements that carry no fact.',
+                     'Check that every claim you need is still there.'):
             self.assertIn(want, html)
+        self.assertNotIn('Humanize', html)
         self.assertNotIn('Replace selection', core.humanize_html(run, SHORT, 'x', can_replace=False))
         done = core.humanize_html(run, SHORT, 'x', state={'replaced': True, 'note': ('Replaced. Ctrl+Z undoes it.', 'ok')})
         self.assertIn('✓ Replaced', done)

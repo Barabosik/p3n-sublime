@@ -9,11 +9,13 @@ on a Mac) or right-click the selection:
 - p3n: Check for AI   A score, a one-line reason, and the sentences that give
                       it away, underlined in your text.
 - p3n: Rewrite        A version that keeps your facts and drops the filler.
-                      "Replace selection" puts it back; Ctrl+Z undoes it.
+                      "Replace selection" puts it back; Ctrl+Z
+                      (Cmd+Z on a Mac) undoes it.
 
 You get 10 checks or rewrites an hour without an account, up to 5,000
-characters each. For more, make an API key at https://p3n.si/dashboard/keys
-and run "p3n: Set API Key".
+characters each. For more, sign up at https://p3n.si/register (you get free
+credit), then create an API key at https://p3n.si/dashboard/keys and run
+"p3n: Set API Key".
 
 Privacy: p3n sends the text you selected to api.p3n.si, only when you run one
 of its commands. It sends nothing else, keeps no history and has no analytics.

@@ -304,25 +304,36 @@ def humanize_html(run, sent, rewrite, has_key=False, free=None, can_replace=True
     if o.get('invented_blocked'):
         parts.append('<p class="small muted">Kept as sent where a rewrite added {}, which the text does not have.</p>'.format(
             esc(', '.join(str(x) for x in o['invented_blocked']))))
-    parts.append('<p class="small muted">Humanize drops filler and general statements that carry no fact. Check that every claim you need is still there.</p>')
+    parts.append('<p class="small muted">The rewrite drops filler and general statements that carry no fact. Check that every claim you need is still there.</p>')
     parts.append(footer(run, has_key, free))
     return page(''.join(parts))
 
 
-def error_parts(e):
-    """The error's copy and buttons: ([paragraph html], [button html])."""
+def error_summary(e):
+    """The error's first line, in plain text: the card opens with it, and the status bar shows it."""
     if e.type == 'free_limit':
         mins = retry_minutes(e)
-        return (['<p>The free checks for this hour are used up{}.</p>'.format('; more in about {} min'.format(mins) if mins else ''),
-                 '<p class="small">Sign up for free credit and an API key, then add the key to keep going.</p>'],
+        return 'The free calls for this hour are used up{}.'.format('; more in about {} min'.format(mins) if mins else '')
+    if e.type == 'insufficient_credit':
+        return 'Your p3n balance is too low for this.'
+    if e.type == 'unauthorized':
+        return "p3n didn't accept your API key. It may have been revoked."
+    if e.type == 'rate_limited':
+        return 'Too many requests at once. Wait a minute and try again.'
+    return e.message or 'Something went wrong.'
+
+
+def error_parts(e):
+    """The error's copy and buttons: ([paragraph html], [button html])."""
+    first = '<p>{}</p>'.format(esc(error_summary(e)))
+    if e.type == 'free_limit':
+        return ([first, '<p class="small">Sign up at p3n.si for free credit, then create an API key and add it to keep going.</p>'],
                 [button('Sign up', signup_link(e), 'primary'), button('Add an API key', 'p3n:key')])
     if e.type == 'insufficient_credit':
-        return ['<p>Your p3n balance is too low for this.</p>'], [button('Top up', LINKS['billing'], 'primary')]
+        return [first], [button('Top up', LINKS['billing'], 'primary')]
     if e.type == 'unauthorized':
-        return ["<p>p3n didn't accept your API key. It may have been revoked.</p>"], [button('Change the key', 'p3n:key')]
-    if e.type == 'rate_limited':
-        return ['<p>Too many requests at once. Wait a minute and try again.</p>'], []
-    return ['<p>{}</p>'.format(esc(e.message or 'Something went wrong.'))], []
+        return [first], [button('Change the key', 'p3n:key')]
+    return [first], []
 
 
 def error_html(skill, e):

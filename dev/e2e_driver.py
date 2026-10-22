@@ -325,17 +325,24 @@ def main():
     select(view, AI)
     check('context menu shown with a selection', m.P3nCheckCommand(view).is_visible(menu=True))
 
-    # 10. Errors, each with its own copy.
+    # 10. Errors, each with its own copy; the status bar shows the card's first line.
     for name, skill, reply in mockmod.ODD:
         mock.queue = [reply]
         select(view, AI)
+        statuses = []
+        real_status = sublime.status_message
+        sublime.status_message = lambda msg: (statuses.append(msg), real_status(msg))
         view.run_command('p3n_check' if skill == 'detect' else 'p3n_rewrite')
         yield idle
+        sublime.status_message = real_status
         r = run_()
         check('error: ' + name, r.error is not None and r.result is None, r.error and r.error.message)
+        check('error: ' + name + ': status bar', r.error and statuses == ['p3n: ' + m.core.error_summary(r.error)], statuses)
         if name == 'free limit':
             html = m.core.error_html(r.skill, r.error)
             check('free limit: Sign up only to p3n.si', 'href="https://p3n.si/register"' in html and 'javascript' not in html)
+            check('free limit: the status bar says calls, not the API message',
+                  statuses == ['p3n: The free calls for this hour are used up; more in about 10 min.'], statuses)
             rest(view)
             yield 0.5
             yield capture(window, 'free-limit')
@@ -439,7 +446,8 @@ def package_control_steps():
     yield (lambda: state.get('done'), 300)
     log('listed %s packages; p3n item %r, version %s' % (state.get('count'), state.get('item'), state.get('version')))
     check('Install Package lists p3n', state.get('item'), state.get('error') or state)
-    check('the version is the latest tag', state.get('version') == '0.1.0', state.get('version'))
+    version = CONFIG['version']
+    check('the version is the latest tag, ' + version, state.get('version') == version, state.get('version'))
     check('no "p3n-sublime" in the list', not state.get('p3n-sublime listed'))
     yield (lambda: 'p3n.plugin' in sys.modules, 60)
     check('the installed package loads', 'p3n.plugin' in sys.modules)
@@ -452,7 +460,7 @@ def package_control_steps():
         files = z.namelist()
         meta = json.loads(z.read('package-metadata.json').decode('utf-8')) if 'package-metadata.json' in files else {}
     log('package files: ' + ', '.join(sorted(files)))
-    check('package-metadata: version 0.1.0', meta.get('version') == '0.1.0', meta)
+    check('package-metadata: version ' + version, meta.get('version') == version, meta)
     check('has the plugin, lib and .python-version', {'plugin.py', 'lib/api.py', 'lib/core.py', '.python-version'} <= set(files), files)
     check('export-ignored files left out', not [f for f in files if f.split('/')[0] in ('tests', 'dev', 'screenshots', '.github', 'repository.json')], files)
     check('settings resolve under Packages/p3n', 'Packages/p3n/p3n.sublime-settings' in sublime.find_resources('p3n.sublime-settings'))
@@ -479,7 +487,7 @@ def package_control_steps():
     view.run_command('p3n_check')
     yield idle
     check('installed: Check for AI', run_().result and run_().result['output']['ai'] == 0.96)
-    check('installed: X-P3N-Client', mock.requests[-1][2].get('X-P3N-Client') == 'p3n-sublime/0.1.0')
+    check('installed: X-P3N-Client', mock.requests[-1][2].get('X-P3N-Client') == 'p3n-sublime/' + version)
     rest(view)
     yield 0.6
     yield capture(window, 'installed-check')

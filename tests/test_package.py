@@ -68,6 +68,7 @@ class PackageTest(unittest.TestCase):
     def test_messages(self):
         for key, path in load('messages.json').items():
             self.assertTrue(os.path.isfile(os.path.join(ROOT, path)), path)
+            self.assertRegex(key, r'^(install|\d+\.\d+\.\d+)$')
         self.assertIn('install', load('messages.json'))
 
     def test_python_version(self):
@@ -77,6 +78,7 @@ class PackageTest(unittest.TestCase):
     def test_version_everywhere(self):
         version = re.search(r"^VERSION = '([\d.]+)'$", read('lib/api.py'), re.M).group(1)
         self.assertRegex(version, r'^\d+\.\d+\.\d+$')
+        self.assertIn('`p3n-sublime/{}`'.format(version), read('PRIVACY.md'))
         tag = os.environ.get('GITHUB_REF_NAME', '')
         if os.environ.get('GITHUB_REF_TYPE') == 'tag':
             self.assertEqual(tag, version, 'the tag must match lib/api.py VERSION')

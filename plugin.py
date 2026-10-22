@@ -183,7 +183,7 @@ def finish(run, result, error, free):
         error = core.bad_output(result)
     if error:
         run.error = error
-        sublime.status_message('p3n: ' + error.message)
+        sublime.status_message('p3n: ' + core.error_summary(error))
         return render(run)
     run.result = result
     if run.skill == 'detect':
@@ -369,7 +369,8 @@ class P3nClearCommand(sublime_plugin.TextCommand):
 
 class P3nSetApiKeyCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('p3n API key (from p3n.si/dashboard/keys):', '', self.check, None, None)
+        self.window.show_input_panel('p3n API key (no key yet? sign up at p3n.si, then create one at p3n.si/dashboard/keys):',
+                                     '', self.check, None, None)
 
     def check(self, key):
         # Checks the key with p3n and saves it only if it works, so a typo never replaces a good key.
