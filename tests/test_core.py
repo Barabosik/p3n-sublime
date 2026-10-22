@@ -120,6 +120,7 @@ class CoreTest(unittest.TestCase):
     def test_free_line(self):
         self.assertEqual(core.free_line(None, False), 'Free without a key: 10 calls an hour, up to 5,000 characters each.')
         self.assertEqual(core.free_line(1, False), '1 free call left this hour without a key.')
+        self.assertEqual(core.free_line(0, False), '0 free calls left this hour without a key.')
         self.assertEqual(core.free_line(9, False), '9 free calls left this hour without a key.')
         self.assertEqual(core.free_line(9, True), '')
 

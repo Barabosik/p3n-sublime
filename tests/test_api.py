@@ -96,6 +96,12 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((e.status, e.type, e.retry_after, e.free), (429, 'free_limit', 600, 0))
         self.assertEqual(e.signup_url, 'javascript:alert(1)')  # kept as sent; core.signup_link refuses it
 
+    def test_last_free_call(self):
+        # The hour's last free call answers with 0 left: that's a count, not a missing header.
+        self.mock.queue = [{'status': 200, 'body': FIXTURES['detect'], 'headers': {'X-Free-Remaining': '0'}}]
+        run, free = api.run_skill('detect', AI_TEXT)
+        self.assertEqual(free, 0)
+
     def test_api_message_is_kept(self):
         self.mock.queue = [ODD[1][2]]
         with self.assertRaises(api.ApiError) as c:
