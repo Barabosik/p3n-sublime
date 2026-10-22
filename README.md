@@ -1,10 +1,21 @@
-# p3n for Sublime Text
+<p align="center">
+  <img src="screenshots/logo.png" width="88" alt="">
+</p>
 
-Select text in Sublime Text and see if it reads as AI-written, or rewrite it in place.
+<h1 align="center">p3n for Sublime Text</h1>
 
-[p3n.si](https://p3n.si) · [Chrome and Firefox](https://github.com/Barabosik/p3n-chrome-extension) · [Word and Excel](https://github.com/Barabosik/p3n-office-addin) · [Google Docs](https://github.com/Barabosik/p3n-google-docs-addon)
+<p align="center">
+  Select text in Sublime Text. See if it reads as AI-written, or rewrite it in place.
+</p>
 
-[![CI](https://github.com/Barabosik/p3n-sublime/actions/workflows/ci.yml/badge.svg)](https://github.com/Barabosik/p3n-sublime/actions/workflows/ci.yml)
+<p align="center">
+  <a href="#install">Install with Package Control</a> · <a href="https://p3n.si">p3n.si</a> · <a href="https://nikita-andreiev.com/p3n/">All p3n apps</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Barabosik/p3n-sublime/actions/workflows/ci.yml"><img src="https://github.com/Barabosik/p3n-sublime/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Barabosik/p3n-sublime/releases/latest"><img src="https://img.shields.io/github/v/release/Barabosik/p3n-sublime?label=release" alt="Latest release"></a>
+</p>
 
 ![Check for AI: a score, the reason, and the sentences that read as AI, underlined](screenshots/check.png)
 
@@ -57,7 +68,7 @@ The right-click menu shows the first two only when text is selected. p3n adds no
 
 ## Free, or with a key
 
-You get 10 checks or rewrites an hour without an account, up to 5,000 characters each. For more, make an API key at [p3n.si/dashboard/keys](https://p3n.si/dashboard/keys) and run **p3n: Set API Key**. With a key, a call takes up to 200,000 characters and is billed to your p3n balance.
+You get 10 checks or rewrites an hour without an account, up to 5,000 characters each. For more, [sign up at p3n.si](https://p3n.si/register) (you get free credit), make a key on the [API keys](https://p3n.si/dashboard/keys) page, and run **p3n: Set API Key**. With a key, a call takes up to 200,000 characters and is billed to your p3n balance.
 
 ## When your text leaves your computer
 
@@ -74,6 +85,10 @@ Your API key is saved in `Packages/User/p3n.sublime-settings`, in plain text. If
 | `show_reasons` | `false` | Also show each sentence's reason at the right edge of the view. |
 
 ![The same card in a light colour scheme](screenshots/check-light.png)
+
+## Other p3n apps
+
+p3n also works in [Chrome and Firefox](https://nikita-andreiev.com/p3n/#browser), [Word and Excel](https://nikita-andreiev.com/p3n/#office), [Google Docs](https://nikita-andreiev.com/p3n/#docs), [VS Code](https://nikita-andreiev.com/p3n/#vscode) and [Obsidian](https://nikita-andreiev.com/p3n/#obsidian). Install steps for each are on [nikita-andreiev.com/p3n](https://nikita-andreiev.com/p3n/).
 
 ## Develop
 
