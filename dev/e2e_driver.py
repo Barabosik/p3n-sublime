@@ -370,6 +370,23 @@ def main():
     check('cancel: the late answer is dropped', run_() is None)
     mock.delay = 0
 
+    # 11b. Refused before sending: the status bar says why, as for a failed call, and doesn't keep an earlier
+    # run's "Checking… N s".
+    mock.delay = 1.5
+    select(view, AI)
+    view.run_command('p3n_check')
+    yield 0.3
+    check('busy: the status bar counts', view.get_status('p3n').startswith('p3n: Checking… '), view.get_status('p3n'))
+    select(view, 'Short text.')
+    shown = status_messages(lambda: view.run_command('p3n_rewrite'))
+    check('refused before sending: the status bar says why',
+          shown == ['p3n: Rewrite needs at least a sentence of eight words. Select more.'], shown)
+    check('refused before sending: the earlier busy line is gone', view.get_status('p3n') == '', view.get_status('p3n'))
+    yield 2
+    check('refused before sending: the earlier answer is dropped',
+          run_().error and run_().error.type == 'too_short' and view.get_status('p3n') == '', view.get_status('p3n'))
+    mock.delay = 0
+
     # 12. Read-only file: no Replace button.
     select(view, SHORT)
     view.run_command('p3n_rewrite')
@@ -402,6 +419,18 @@ def main():
     check('clear: card and underlines gone', run_() is None and not view.get_regions('p3n.mark.s0') and not view.get_regions('p3n.source'))
     check('buffer unchanged at the end', buffer(view) == original)
     mock.stop()
+
+
+def status_messages(fn):
+    """Runs fn() and returns what it showed with sublime.status_message."""
+    shown = []
+    real = sublime.status_message
+    sublime.status_message = lambda msg: (shown.append(msg), real(msg))
+    try:
+        fn()
+    finally:
+        sublime.status_message = real
+    return shown
 
 
 def rest(view):

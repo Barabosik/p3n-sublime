@@ -139,6 +139,7 @@ def start(view, skill, regions=None, sent=None, options=None):
     if old:
         old.cancel.set()
         clear_marks(view, old)
+        view.erase_status('p3n')  # its "Checking… N s", if it was still going
     view.add_regions(SOURCE, regions, '', '', sublime.HIDDEN)
     if sent is None:
         sent = '\n\n'.join(view.substr(r) for r in regions).strip()
@@ -149,6 +150,7 @@ def start(view, skill, regions=None, sent=None, options=None):
     if err:
         run.busy = False
         run.error = err
+        sublime.status_message('p3n: ' + core.error_summary(err))
         return render(run)
     render(run)
     tick(run)
