@@ -88,6 +88,18 @@ class PackageTest(unittest.TestCase):
         hosts = set(re.findall(r'https?://([\w.-]+)', read('lib/api.py') + read('plugin.py')))
         self.assertEqual(hosts, {'api.p3n.si', 'p3n.si'})
 
+    def test_repository_json(self):
+        # Package Control's Add Repository reads this until p3n is in the default channel. It must name the
+        # package p3n (a bare GitHub URL would name it p3n-sublime) and release from tags, like the channel entry.
+        repo = load('repository.json')
+        self.assertEqual(repo['schema_version'], '3.0.0')
+        self.assertEqual(len(repo['packages']), 1)
+        pkg = repo['packages'][0]
+        self.assertEqual(pkg['name'], 'p3n')
+        self.assertEqual(pkg['details'], 'https://github.com/Barabosik/p3n-sublime')
+        self.assertEqual(pkg['releases'], [{'sublime_text': '>=4107', 'tags': True}])
+        self.assertIn('/repository.json export-ignore', read('.gitattributes'))
+
     def test_no_stray_files(self):
         for dirpath, dirnames, filenames in os.walk(ROOT):
             dirnames[:] = [d for d in dirnames if d not in ('.git', '__pycache__', 'portable', 'out')]

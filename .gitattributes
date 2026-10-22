@@ -9,3 +9,5 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /CONTRIBUTING.md export-ignore
+# For Package Control's Add Repository until the package is in the default channel; not part of the package.
+/repository.json export-ignore

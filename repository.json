@@ -1,0 +1,16 @@
+{
+	"schema_version": "3.0.0",
+	"packages": [
+		{
+			"name": "p3n",
+			"details": "https://github.com/Barabosik/p3n-sublime",
+			"labels": ["ai", "text manipulation", "prose"],
+			"releases": [
+				{
+					"sublime_text": ">=4107",
+					"tags": true
+				}
+			]
+		}
+	]
+}
