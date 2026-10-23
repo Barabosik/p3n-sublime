@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- A **p3n.si ↗** link at the foot of each result card, with or without a key, and **p3n: Open p3n.si** in the command palette and under Preferences › Package Settings › p3n. Both open p3n.si in your browser.
+
 ## 0.1.2
 
 - Rewrite needs at least a sentence of eight words, and p3n now says so before sending anything, as it already did for Check's 40 characters. Words are counted the way p3n counts them, so numbers don't count.
