@@ -17,6 +17,7 @@ CLIENT = 'p3n-sublime/' + VERSION
 API = 'https://api.p3n.si'
 SITE = 'https://p3n.si'
 LINKS = {
+    'home': SITE + '/',
     'keys': SITE + '/dashboard/keys',
     'billing': SITE + '/dashboard/billing',
     'signup': SITE + '/register',

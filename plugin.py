@@ -95,6 +95,11 @@ def hint(view, msg):
         view.show_popup(core.hint_html(msg), sublime.HIDE_ON_MOUSE_MOVE_AWAY, view.sel()[0].b, 640, 320)
 
 
+def open_in_browser(url):
+    """The one way p3n opens a page: Sublime's own open_url, which uses the system's browser."""
+    sublime.run_command('open_url', {'url': url})
+
+
 def clear_marks(view, run=None):
     for key in (run.marks if run else []):
         view.erase_regions(key)
@@ -251,7 +256,7 @@ def navigate(view, href):
     if href.startswith('https://') or href.startswith('http://'):
         # Only p3n's own pages; anything else in an answer isn't followed.
         if href.startswith(api.SITE + '/'):
-            sublime.run_command('open_url', {'url': href})
+            open_in_browser(href)
         return
     if href == 'p3n:close':
         return close(view)
@@ -416,6 +421,11 @@ class P3nRemoveApiKeyCommand(sublime_plugin.WindowCommand):
 
     def is_visible(self):
         return bool((settings().get('api_key') or '').strip())
+
+
+class P3nOpenSiteCommand(sublime_plugin.ApplicationCommand):
+    def run(self):
+        open_in_browser(api.LINKS['home'])
 
 
 class P3nListener(sublime_plugin.EventListener):

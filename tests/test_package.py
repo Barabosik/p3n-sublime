@@ -42,7 +42,7 @@ class PackageTest(unittest.TestCase):
     def test_commands_exist(self):
         mine = plugin_commands()
         self.assertEqual(mine, {'p3n_check', 'p3n_rewrite', 'p3n_replace', 'p3n_cancel', 'p3n_clear',
-                                'p3n_set_api_key', 'p3n_remove_api_key'})
+                                'p3n_set_api_key', 'p3n_remove_api_key', 'p3n_open_site'})
         for name in ('Default.sublime-commands', 'Context.sublime-menu', 'Main.sublime-menu'):
             for cmd, args in commands(load(name)):
                 self.assertTrue(cmd in mine or cmd == 'edit_settings', (name, cmd))
@@ -54,6 +54,17 @@ class PackageTest(unittest.TestCase):
         self.assertEqual(plugin_commands() - palette, {'p3n_replace'})  # Replace lives on the card
         for item in load('Default.sublime-commands'):
             self.assertTrue(item['caption'].startswith('p3n: ') or item['caption'] == 'Preferences: p3n Settings')
+
+    def test_open_site(self):
+        palette = dict((item['command'], item['caption']) for item in load('Default.sublime-commands'))
+        self.assertEqual(palette['p3n_open_site'], 'p3n: Open p3n.si')
+        p3n = load('Main.sublime-menu')[0]['children'][0]['children'][0]
+        self.assertEqual(p3n['caption'], 'p3n')
+        self.assertIn({'caption': 'Open p3n.si', 'command': 'p3n_open_site'}, p3n['children'])
+        # The card's links and the command open the browser the same way: Sublime's open_url, in one place.
+        plugin = read('plugin.py')
+        self.assertEqual(plugin.count("'open_url'"), 1)
+        self.assertNotIn('webbrowser', plugin)
 
     def test_context_menu_is_conditional(self):
         for cmd, args in commands(load('Context.sublime-menu')):

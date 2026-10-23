@@ -18,7 +18,8 @@
 									"default": "// Your p3n settings. The defaults are on the left.\n{\n\t$0\n}\n"
 								}
 							},
-							{ "caption": "Set API Key…", "command": "p3n_set_api_key" }
+							{ "caption": "Set API Key…", "command": "p3n_set_api_key" },
+							{ "caption": "Open p3n.si", "command": "p3n_open_site" }
 						]
 					}
 				]

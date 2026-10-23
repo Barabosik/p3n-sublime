@@ -184,6 +184,8 @@ def main():
     run_ = lambda: m._runs.get(view.id())
     idle = lambda: run_() is not None and not run_().busy
     calls = lambda: len(mock.requests) if mock else 0
+    card = lambda: m._phantoms[view.id()].phantoms[0].content
+    site = '<a class="link" href="https://p3n.si/">p3n.si ↗</a></p>'
 
     if live or shots:
         for g in live_steps(m, api, window, view, AI, SHORT, original, run_, idle, 'live' if live else 'readme'):
@@ -208,6 +210,7 @@ def main():
     check('check: sends the selection', req[3] == {'text': AI}, req[3])
     check('check: free count from the header', m._free == 9, m._free)
     check('check: the selection is untouched', view.sel()[0] == select(view, AI))
+    check('check: the footer links to p3n.si after the free count', '9 free calls left this hour without a key. · ' + site in card(), card()[-300:])
     rest(view)
     yield 0.6
     yield capture(window, 'check-dark')
@@ -215,6 +218,17 @@ def main():
     # 2. A quote in the card jumps to its sentence.
     m.navigate(view, 'p3n:goto:s0')
     check('goto: selects the sentence', view.substr(view.sel()[0]) == sentence)
+
+    # 2b. The footer's p3n.si link and p3n: Open p3n.si both go through open_url (recorded here, so no browser opens).
+    opened = []
+    real_run = sublime.run_command
+    sublime.run_command = lambda cmd, args=None: opened.append(args) if cmd == 'open_url' else real_run(cmd, args)
+    try:
+        m.navigate(view, 'https://p3n.si/')
+        sublime.run_command('p3n_open_site')
+    finally:
+        sublime.run_command = real_run
+    check('p3n.si: the link and the command open it in the browser', opened == [{'url': 'https://p3n.si/'}] * 2, opened)
 
     # 3. The same card in a light colour scheme.
     view.settings().set('color_scheme', 'Breakers.sublime-color-scheme')
@@ -424,6 +438,7 @@ def main():
     view.run_command('p3n_check')
     yield idle
     check('keyed call: bearer token', mock.requests[-1][2].get('Authorization') == 'Bearer p3n_good')
+    check('keyed card: the footer still links to p3n.si', 'detect-v1.2 · ' + site in card(), card()[-300:])
     m.P3nRemoveApiKeyCommand(window).run()
     check('remove key', not m.settings().get('api_key'))
 

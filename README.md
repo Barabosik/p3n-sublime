@@ -57,6 +57,7 @@ Select some text, then right-click it or open the command palette (Ctrl+Shift+P,
 | p3n: Clear Results | Closes the card and removes the underlines. |
 | p3n: Set API Key | Checks a key with p3n, then saves it. |
 | p3n: Remove API Key | Removes the saved key. |
+| p3n: Open p3n.si | Opens p3n.si in your browser. |
 | Preferences: p3n Settings | Opens the settings. |
 
 Check needs at least 40 characters, a sentence or two, and Rewrite at least eight words. p3n says so before sending anything.

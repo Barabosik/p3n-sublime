@@ -129,6 +129,16 @@ class CoreTest(unittest.TestCase):
         self.assertEqual(core.meta_line(run, True), 'detect-v1.2 · from cache · $0.0026')
         self.assertEqual(core.meta_line(run, False), 'detect-v1.2 · from cache')
 
+    def test_footer_links_to_the_site(self):
+        # After the quota line, with or without a key; the plugin follows it because it's on p3n's own site.
+        link = '<a class="link" href="https://p3n.si/">p3n.si ↗</a>'
+        run = dict(FIXTURES['detect'], charged_usd='0.002600')
+        self.assertEqual(core.footer(run, False, 9), '<p class="small muted">detect-v1.2 · 9 free calls left this hour without a key. · {}</p>'.format(link))
+        self.assertEqual(core.footer(run, True, 9), '<p class="small muted">detect-v1.2 · $0.0026 · {}</p>'.format(link))
+        self.assertTrue(api.LINKS['home'].startswith(api.SITE + '/'))
+        self.assertIn(link, core.detect_html(FIXTURES['detect']))
+        self.assertIn(link, core.humanize_html(FIXTURES['humanize'], SHORT, 'x', has_key=True))
+
     def test_detect_card(self):
         run = run_of('detect', verdict='<script>alert(1)</script>')
         html = core.detect_html(run, False, 9, found={0})

@@ -222,8 +222,9 @@ def meter(x, t):
 
 
 def footer(run, has_key, free):
-    bits = [b for b in (meta_line(run, has_key), free_line(free, has_key)) if b]
-    return '<p class="small muted">{}</p>'.format(esc(' · '.join(bits)))
+    bits = [esc(b) for b in (meta_line(run, has_key), free_line(free, has_key)) if b]
+    bits.append('<a class="link" href="{}">p3n.si ↗</a>'.format(esc(LINKS['home'])))
+    return '<p class="small muted">{}</p>'.format(' · '.join(bits))
 
 
 def busy_line(skill, seconds):

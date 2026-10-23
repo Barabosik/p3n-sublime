@@ -5,6 +5,7 @@
 	{ "caption": "p3n: Clear Results", "command": "p3n_clear" },
 	{ "caption": "p3n: Set API Key", "command": "p3n_set_api_key" },
 	{ "caption": "p3n: Remove API Key", "command": "p3n_remove_api_key" },
+	{ "caption": "p3n: Open p3n.si", "command": "p3n_open_site" },
 	{
 		"caption": "Preferences: p3n Settings",
 		"command": "edit_settings",
